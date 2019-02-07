@@ -1,0 +1,25 @@
+body{
+  float: left;
+  position: relative;
+  left: 50%;
+}
+.main-container{
+  float: left;
+position: relative;
+left: -50%;
+}
+.completed{
+  text-decoration: line-through;
+}
+.delete-button{
+  margin-left: 20px;
+}
+.toggle-button{
+  margin-left:auto;
+}
+.hide{
+  display:none;
+}
+.edit-input{
+  display:block;
+}
