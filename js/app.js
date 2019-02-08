@@ -77,13 +77,21 @@ var view = {
       noTodosP.textContent = "Looks like there are no more todos";
       ul.appendChild(noTodosP);
     }
-    for(var i=0;i < todoList.todos.length; i++){
-      this.createTodoLi(todoList.todos[i],i, todoList.todos);
-    }
+      this.renderLi(todoList.todos, ul);
     //saves todos
     util.store('todoListData', todoList.todos)
   },
-  createTodoLi: function(todo,indexOfTodo, array){
+  renderLi: function(array, ulToAppendTo){
+    for(var i=0; i<array.length; i++){
+      this.createTodoLi(array[i],i,array,ulToAppendTo)
+      if(array[i].children.length >0){
+        var nestedUl = document.createElement('ul');
+        ulToAppendTo.appendChild(nestedUl);
+        this.renderLi(array[i].children, nestedUl);
+      }
+    }
+  },
+  createTodoLi: function(todo,indexOfTodo, array, ulToAppendTo){
     var todoLi = document.createElement("li")
     var todoTextP = document.createElement('p')
     todoTextP.textContent = todo.todoName;
@@ -96,7 +104,7 @@ var view = {
     var editInput = this.createEditInput(todo, indexOfTodo);
     var addSubTodoButton = this.createAddSubTodoButton(todo.children);
 
-    document.getElementById("todo-list").appendChild(todoLi);
+    ulToAppendTo.appendChild(todoLi);
     todoLi.appendChild(todoTextP)
     todoLi.appendChild(editInput);
     todoLi.appendChild(deleteButton);
@@ -157,7 +165,8 @@ var view = {
     addSubTodoButton.className = 'add-sub-todo';
 
     addSubTodoButton.onclick = function(){
-      todoList.addTodo(' ',array)
+      todoList.addTodo('New SubTodo',array);
+      view.render();
     }
 
     return addSubTodoButton;
