@@ -94,12 +94,14 @@ var view = {
     var deleteButton = this.createDeleteButton(indexOfTodo, array);
     var toggleButton = this.createToggleCompletedButton(todo);
     var editInput = this.createEditInput(todo, indexOfTodo);
+    var addSubTodoButton = this.createAddSubTodoButton(todo.children);
 
     document.getElementById("todo-list").appendChild(todoLi);
     todoLi.appendChild(todoTextP)
     todoLi.appendChild(editInput);
     todoLi.appendChild(deleteButton);
     todoLi.appendChild(toggleButton);
+    todoLi.appendChild(addSubTodoButton);
 
 //when todoTextP is double clicked you can edit todo
     todoTextP.addEventListener('dblclick', function(){
@@ -142,12 +144,23 @@ var view = {
     var toggleButton = document.createElement('button');
     toggleButton.textContent = "Toggle Todo";
     toggleButton.className = 'toggle-button';
-    
+
     toggleButton.onclick = function(){
         todoList.toggleTodo(todo);
         view.render();
       };
     return toggleButton;
+  },
+  createAddSubTodoButton: function(array){
+    var addSubTodoButton = document.createElement('button');
+    addSubTodoButton.textContent = 'Add Sub Todo';
+    addSubTodoButton.className = 'add-sub-todo';
+
+    addSubTodoButton.onclick = function(){
+      todoList.addTodo(' ',array)
+    }
+
+    return addSubTodoButton;
   },
 }
 var util = {

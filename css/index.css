@@ -17,6 +17,9 @@ left: -50%;
 .toggle-button{
   margin-left: 15px;
 }
+.add-sub-todo{
+  margin-left: 15px;
+}
 .hide{
   display:none;
 }
