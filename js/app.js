@@ -1,21 +1,21 @@
 var todoList = {
   todos : [],
 
-  addTodo: function(todoName){
-    this.todos.push({
+  addTodo: function(todoName, array){
+    array.push({
       todoName: todoName,
       completed:false,
       children: [],
     })
   },
-  editTodo: function(todoPos, newTodoName){
-    this.todos[todoPos].todoName = newTodoName;
+  editTodo: function(todo, newTodoName){
+    todo.todoName = newTodoName;
   },
-  deleteTodo: function(todoPos){
-    this.todos.splice(todoPos,1);
+  deleteTodo: function(indexOfTodo, array){
+    array.splice(indexOfTodo,1);
   },
-  toggleTodo: function(todoPos){
-    this.todos[todoPos].completed = !this.todos[todoPos].completed
+  toggleTodo: function(todo){
+    todo.completed = !todo.completed
   },
   toggleAll: function(){
     //checks if any of the todos are false
@@ -49,7 +49,7 @@ var todoList = {
 var handlers = {
   addTodo: function(){
     var todoInput = document.getElementById('add-todo-input');
-    todoList.addTodo(todoInput.value);
+    todoList.addTodo(todoInput.value, todoList.todos);
     todoInput.value = "";
     view.render();
   },
@@ -78,22 +78,22 @@ var view = {
       ul.appendChild(noTodosP);
     }
     for(var i=0;i < todoList.todos.length; i++){
-      this.createTodoLi(i);
+      this.createTodoLi(todoList.todos[i],i, todoList.todos);
     }
     //saves todos
     util.store('todoListData', todoList.todos)
   },
-  createTodoLi: function(indexOfTodo){
+  createTodoLi: function(todo,indexOfTodo, array){
     var todoLi = document.createElement("li")
     var todoTextP = document.createElement('p')
-    todoTextP.textContent = todoList.todos[indexOfTodo].todoName;
+    todoTextP.textContent = todo.todoName;
     todoTextP.id = indexOfTodo + 'p'
-    if(todoList.todos[indexOfTodo].completed === true){
+    if(todo.completed === true){
       todoLi.className += 'completed';
     }
-    var deleteButton = this.createDeleteButton(indexOfTodo);
-    var toggleButton = this.createToggleCompletedButton(indexOfTodo);
-    var editInput = this.createEditInput(indexOfTodo);
+    var deleteButton = this.createDeleteButton(indexOfTodo, array);
+    var toggleButton = this.createToggleCompletedButton(todo);
+    var editInput = this.createEditInput(todo, indexOfTodo);
 
     document.getElementById("todo-list").appendChild(todoLi);
     todoLi.appendChild(todoTextP)
@@ -108,16 +108,16 @@ var view = {
       editInput.focus();
     })
   },
-  createEditInput: function(indexOfTodo){
+  createEditInput: function(todo, indexOfTodo){
     var editInput = document.createElement('input');
-    editInput.value = todoList.todos[indexOfTodo].todoName;
+    editInput.value = todo.todoName;
     editInput.style.display = 'none';
     editInput.id= indexOfTodo + 'input'
 
     //makes changes and hides todo Input when enter is pressed
     editInput.addEventListener('keypress', function(e){
       if(e.key === 'Enter'){
-        todoList.editTodo(indexOfTodo, editInput.value);
+        todoList.editTodo(todo, editInput.value);
         editInput.style.display = "none"
         var todoTextP = document.getElementById(indexOfTodo + 'p')
         todoTextP.style.display = "block";
@@ -127,22 +127,24 @@ var view = {
 
     return editInput;
   },
-  createDeleteButton: function(indexOfTodo){
+  createDeleteButton: function(indexOfTodo, array){
     var deleteButton = document.createElement('button');
     deleteButton.textContent = "deleteTodo";
     deleteButton.className += 'delete-button'
+
     deleteButton.onclick = function(){
-        todoList.deleteTodo(indexOfTodo);
+        todoList.deleteTodo(indexOfTodo, array);
         view.render();
       };
     return deleteButton;
   },
-  createToggleCompletedButton: function(indexOfTodo){
+  createToggleCompletedButton: function(todo){
     var toggleButton = document.createElement('button');
     toggleButton.textContent = "Toggle Todo";
     toggleButton.className = 'toggle-button';
+    
     toggleButton.onclick = function(){
-        todoList.toggleTodo(indexOfTodo);
+        todoList.toggleTodo(todo);
         view.render();
       };
     return toggleButton;

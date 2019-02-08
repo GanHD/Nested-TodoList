@@ -4,18 +4,18 @@ body{
   left: 50%;
 }
 .main-container{
-  float: left;
+  float: right;
 position: relative;
 left: -50%;
 }
 .completed{
   text-decoration: line-through;
 }
-.delete-button{
-  margin-left: 20px;
-}
+/* .delete-button{
+  float:left;
+}*/
 .toggle-button{
-  margin-left:auto;
+  margin-left: 15px;
 }
 .hide{
   display:none;
@@ -23,3 +23,8 @@ left: -50%;
 .edit-input{
   display:block;
 }
+#todo-list{
+  border:4px solid;
+}
+/* p{
+float:left} */
