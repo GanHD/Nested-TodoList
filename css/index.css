@@ -11,9 +11,6 @@ left: -50%;
 .completed{
   text-decoration: line-through;
 }
-/* .delete-button{
-  float:left;
-}*/
 .toggle-button{
   margin-left: 15px;
 }
@@ -29,5 +26,6 @@ left: -50%;
 #todo-list{
   border:4px solid;
 }
-/* p{
-float:left} */
+#buttons{
+  text-align: center;
+}

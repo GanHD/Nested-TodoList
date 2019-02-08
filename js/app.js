@@ -74,7 +74,7 @@ var view = {
     //inserts text for when there are no todos
     if(todoList.todos.length === 0){
       var noTodosP = document.createElement('p');
-      noTodosP.textContent = "Looks like there are no more todos";
+      noTodosP.textContent = "Looks like there are no todos";
       ul.appendChild(noTodosP);
     }
       this.renderLi(todoList.todos, ul);
