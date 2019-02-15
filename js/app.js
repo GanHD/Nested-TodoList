@@ -1,12 +1,14 @@
 var todoList = {
   todos : [],
 
-  addTodo: function(todoName, array){
-    array.push({
+  addTodo: function(todoName, array, indexToInsertIn){
+    array.splice(indexToInsertIn,0,{
       todoName: todoName,
       completed:false,
       children: [],
+      id: util.uuid(),
     })
+    return array[indexToInsertIn].id
   },
   editTodo: function(todo, newTodoName){
     todo.todoName = newTodoName;
@@ -49,7 +51,9 @@ var todoList = {
 var handlers = {
   addTodo: function(){
     var todoInput = document.getElementById('add-todo-input');
-    todoList.addTodo(todoInput.value, todoList.todos);
+    //add todo to the end of the main todo list
+    todoList.addTodo(todoInput.value, todoList.todos, todoList.todos.length);
+    //clear todoInput
     todoInput.value = "";
     view.render();
   },
@@ -93,45 +97,39 @@ var view = {
   },
   createTodoLi: function(todo,indexOfTodo, array, ulToAppendTo){
     var todoLi = document.createElement("li")
-    var todoTextP = document.createElement('p')
-    todoTextP.textContent = todo.todoName;
-    todoTextP.id = indexOfTodo + 'p'
     if(todo.completed === true){
       todoLi.className += 'completed';
     }
+
     var deleteButton = this.createDeleteButton(indexOfTodo, array);
     var toggleButton = this.createToggleCompletedButton(todo);
-    var editInput = this.createEditInput(todo, indexOfTodo);
+    var editInput = this.createEditInput(todo, indexOfTodo, array);
     var addSubTodoButton = this.createAddSubTodoButton(todo.children);
 
     ulToAppendTo.appendChild(todoLi);
-    todoLi.appendChild(todoTextP)
     todoLi.appendChild(editInput);
     todoLi.appendChild(deleteButton);
     todoLi.appendChild(toggleButton);
     todoLi.appendChild(addSubTodoButton);
 
 //when todoTextP is double clicked you can edit todo
-    todoTextP.addEventListener('dblclick', function(){
-      editInput.style.display = "block";
-      todoTextP.style.display = "none";
-      editInput.focus();
-    })
   },
-  createEditInput: function(todo, indexOfTodo){
+  createEditInput: function(todo, indexOfTodo, array){
     var editInput = document.createElement('input');
     editInput.value = todo.todoName;
-    editInput.style.display = 'none';
-    editInput.id= indexOfTodo + 'input'
+    editInput.id= todo.id;
 
     //makes changes and hides todo Input when enter is pressed
-    editInput.addEventListener('keypress', function(e){
-      if(e.key === 'Enter'){
+    editInput.addEventListener('keyup', function(e){
         todoList.editTodo(todo, editInput.value);
-        editInput.style.display = "none"
-        var todoTextP = document.getElementById(indexOfTodo + 'p')
-        todoTextP.style.display = "block";
+    })
+    //if enter is pressed add a new todo right under current todo
+    editInput.addEventListener('keypress',function(e){
+      if(e.key === "Enter"){
+        var todoId = todoList.addTodo('', array, indexOfTodo + 1)
         view.render();
+        var todoElement = document.getElementById(todoId);
+        todoElement.focus();
       }
     })
 
@@ -165,8 +163,11 @@ var view = {
     addSubTodoButton.className = 'add-sub-todo';
 
     addSubTodoButton.onclick = function(){
-      todoList.addTodo('New SubTodo',array);
+      var subtodoId = todoList.addTodo('New SubTodo',array, array.length);
       view.render();
+
+      var subTodoElement = document.getElementById(subtodoId);
+      subTodoElement.focus();
     }
 
     return addSubTodoButton;
@@ -181,6 +182,21 @@ var util = {
       return localStorage.setItem(nameSpace, JSON.stringify(data));
     }
   },
+  uuid: function () {
+			/*jshint bitwise:false */
+			var i, random;
+			var uuid = '';
+
+			for (i = 0; i < 32; i++) {
+				random = Math.random() * 16 | 0;
+				if (i === 8 || i === 12 || i === 16 || i === 20) {
+					uuid += '-';
+				}
+				uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+			}
+
+			return uuid;
+		},
 }
 document.getElementById("add-todo-input").addEventListener('keypress', function(e){
   if(e.key === "Enter"){
@@ -189,4 +205,4 @@ document.getElementById("add-todo-input").addEventListener('keypress', function(
 })
 //loads todos from last session and renders todo List
 todoList.todos = util.store('todoListData')
-view.render();
+view.render(document.getElementById('add-todo-input'));
