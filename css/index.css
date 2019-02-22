@@ -1,7 +1,15 @@
+input{
+  outline-offset: 0;
+}
 body{
   float: left;
   position: relative;
   left: 50%;
+}
+
+li{
+  margin-top: 20px;
+  margin-bottom: 3px;
 }
 .main-container{
   float: right;
@@ -17,7 +25,7 @@ left: -50%;
 .add-sub-todo{
   margin-left: 15px;
 }
-.hide{
+.hidden{
   display:none;
 }
 .edit-input{
@@ -28,4 +36,13 @@ left: -50%;
 }
 #buttons{
   text-align: center;
+}
+.collapse-button {
+
+}
+.li-div{
+  white-space: nowrap;
+}
+.selected{
+  background: rgba(83,164,245,0.77);
 }
