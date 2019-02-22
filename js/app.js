@@ -102,7 +102,7 @@ var view = {
       this.renderList(todoList.todos, ul);
     //saves todos
     util.store('todoListData', todoList.todos)
-    document.getElementById("add-todo-input").focus();  
+    document.getElementById("add-todo-input").focus();
   },
   renderList: function(array, ulToAppendTo){
     for(var i=0; i<array.length; i++){
@@ -172,11 +172,18 @@ var view = {
     })
     //if enter is pressed rerender
     editInput.addEventListener('keypress',function(e){
-      if(e.key === "Enter"){
+      if(e.key === "Enter" && event.shiftKey === false){
         if(editInput.value === ""){
           todoList.deleteTodo(indexOfTodo, array);
+          view.render();
         }
+      }
+      //shift enter adds a subtodo at the end of the subtodo list
+      if(e.key === "Enter" && event.shiftKey === true){
+        var subTodoId = todoList.addTodo('New SubTodo', todo.children, todo.children.length - 1);
         view.render();
+        var subTodoP = document.getElementById(subTodoId + 'p');
+        subTodoP.click();
       }
     })
     editInput.addEventListener('blur',function(e){
