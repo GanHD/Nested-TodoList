@@ -102,6 +102,7 @@ var view = {
       this.renderList(todoList.todos, ul);
     //saves todos
     util.store('todoListData', todoList.todos)
+    document.getElementById("add-todo-input").focus();  
   },
   renderList: function(array, ulToAppendTo){
     for(var i=0; i<array.length; i++){
@@ -172,6 +173,9 @@ var view = {
     //if enter is pressed rerender
     editInput.addEventListener('keypress',function(e){
       if(e.key === "Enter"){
+        if(editInput.value === ""){
+          todoList.deleteTodo(indexOfTodo, array);
+        }
         view.render();
       }
     })
