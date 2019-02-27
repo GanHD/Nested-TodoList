@@ -6,8 +6,9 @@ var todoList = {
       todoName: todoName,
       completed:false,
       children: [],
-       id: util.uuid(),
+      id: util.uuid(),
       collapsed: false,
+      parent: (array + "").replace(".children", ""),
     })
     return array[indexToInsertIn].id
   },
@@ -170,25 +171,60 @@ var view = {
     editInput.addEventListener('keyup', function(e){
         todoList.editTodo(todo, editInput.value);
     })
-    //if enter is pressed rerender
-    editInput.addEventListener('keypress',function(e){
+
+    editInput.addEventListener('keydown',function(e){
+      //create new todo if enter is pressed
       if(e.key === "Enter" && event.shiftKey === false){
-        if(editInput.value === ""){
-          todoList.deleteTodo(indexOfTodo, array);
+          var newTodoId = todoList.addTodo("New Todo", array, indexOfTodo + 1);
           view.render();
-        }
+          document.getElementById(newTodoId + 'p').click();
       }
+
       //shift enter adds a subtodo at the end of the subtodo list
       if(e.key === "Enter" && event.shiftKey === true){
-        var subTodoId = todoList.addTodo('New SubTodo', todo.children, todo.children.length - 1);
+        var subTodoId = todoList.addTodo('New SubTodo', todo.children, todo.children.length);
         view.render();
         var subTodoP = document.getElementById(subTodoId + 'p');
         subTodoP.click();
       }
-    })
+
+      //if pagedown is pressed, indent that todo.
+      if(e.key === "PageDown"){
+        //if there isnt a todo to become a subtodo of, dont do anything
+        if(array[indexOfTodo - 1] === undefined) return;
+
+        arrayToInsertIn = array[indexOfTodo - 1].children;
+        //inserts todo into previous todo subtodo list
+        arrayToInsertIn.splice(arrayToInsertIn.length, 0, todo);
+        //deletes old todo
+        todoList.deleteTodo(indexOfTodo, array);
+
+        //rerender and focus on todo
+        view.render();
+        var newSubTodo = document.getElementById(id + 'p');
+        newSubTodo.click();
+      }
+
+      //outdent todo if pageup is pressed
+      if(e.key === "PageUp"){
+        //sets findObject  to object with
+        var findObject = util.findInTodo(todoList.todos, todo);
+
+        //inserts todo into previous todo subtodo list
+        findObject.parentArray.splice(findObject.parentIndex + 1, 0, todo);
+        //deletes old todo
+        todoList.deleteTodo(indexOfTodo, array);
+
+        //rerender and focus on todo
+        view.render();
+        var outdentedTodo = document.getElementById(id + 'p');
+        outdentedTodo.click();
+      }
+    });
+    //save changes and exit edit input if user clicks off edit input
     editInput.addEventListener('blur',function(e){
         view.render();
-    })
+    });
     return editInput;
   },
   createDeleteButton: function(indexOfTodo, array){
@@ -266,6 +302,24 @@ var util = {
 
 			return uuid;
 		},
+  //
+  findInTodo: function(array, item){
+    for(var i=0; i< array.length; i++){
+      if(array[i].children.length > 0){
+        var result = this.findInTodo(array[i].children, item)
+        //return result if the object is found nested within an array
+        //modifies result to add parentArray
+        if(result.length === 1){
+          result.parentIndex = i;
+          result.parentArray = array;
+          result.length++;
+        }
+        if(result.length === 2) return result;
+      }
+
+      if(array[i] === item) return {length:1};
+    }
+  }
 }
 //when enter is pressed on new todo input, a new todo is created
 document.getElementById("add-todo-input").addEventListener('keypress', function(e){
@@ -320,9 +374,9 @@ document.onkeydown = function(e){
       return  pElementOfNextTodo.click();
     }
     //if user is not focused on anything when arrow key is pressed. It focuses on add todo input
-    else{
-      addTodoInput.focus();
-    }
+    // else{
+    //   addTodoInput.focus();
+    // }
   }
 
 }
